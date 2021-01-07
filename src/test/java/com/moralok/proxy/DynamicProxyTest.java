@@ -1,7 +1,11 @@
 package com.moralok.proxy;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 
 /**
  * 动态代理测试
@@ -11,11 +15,21 @@ import org.junit.jupiter.api.Test;
  */
 public class DynamicProxyTest {
 
+    private Teacher teacher;
+
+    private TeacherHandler teacherHandler;
+
+    private Object proxy;
+
+    @BeforeEach
+    void setUp() {
+        teacher = new Teacher();
+        teacherHandler = new TeacherHandler(teacher);
+        proxy = teacherHandler.getProxy();
+    }
+
     @Test
     void dynamicProxyTest() {
-        Teacher teacher = new Teacher();
-        TeacherHandler teacherHandler = new TeacherHandler(teacher);
-        Object proxy = teacherHandler.getProxy();
         Worker worker = (Worker) proxy;
         worker.work();
         Runner runner = (Runner) proxy;
@@ -34,5 +48,18 @@ public class DynamicProxyTest {
         } catch (Exception e) {
             Assertions.assertTrue(e instanceof IllegalArgumentException);
         }
+    }
+
+    @Test
+    void proxyClassTest() {
+        // 调用的处理程序相同
+        InvocationHandler invocationHandler = Proxy.getInvocationHandler(proxy);
+        Assertions.assertSame(invocationHandler, teacherHandler);
+        // 相同的类加载器和指定接口数组可以生成同一个Class
+        Class[] interfaces = new Class[] {Worker.class, Runner.class, NoImplement.class};
+        Class<?> proxyClass = Proxy.getProxyClass(teacher.getClass().getClassLoader(), interfaces);
+        Assertions.assertSame(proxy.getClass(), proxyClass);
+        // 可以判断是否为代理类
+        Assertions.assertTrue(Proxy.isProxyClass(proxyClass));
     }
 }
