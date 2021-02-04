@@ -10,6 +10,11 @@ public class Person {
 
     private Integer age;
 
+    /**
+     * public! volatile! primitive!
+     */
+    public volatile int id;
+
     public Person() {
 
     }
@@ -17,6 +22,12 @@ public class Person {
     public Person(String name, Integer age) {
         this.name = name;
         this.age = age;
+    }
+
+    public Person(String name, Integer age, int id) {
+        this.name = name;
+        this.age = age;
+        this.id = id;
     }
 
     public String getName() {
@@ -40,6 +51,7 @@ public class Person {
         return "Person{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
+                ", id=" + id +
                 '}';
     }
 }
